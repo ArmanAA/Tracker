@@ -13,16 +13,28 @@
 <script>
     document.getElementById("demo").innerHTML = "Hello JavaScript!";
     </script> 
-    <script>
+    <!-- <script>$(document).ready(function(){$.ajax({ url:"http://localhost:8080/api/tracker/ping" ,
+    context: document.body,});});</script> -->
+    <script>	const id = 1;$(document).ready(function(){	$.ajax({ url:"http://localhost:8080/api/tracker/ping",	context: document.body,	type: "get",	data:{UniqueID:1	},	success: function(){	console.log("success")	}	,	error: function() {console.log("ERROR AJAX")}});});</script>
+    <!-- <script>
+        const id = 1;
    $(document).ready(function(){
-        $.ajax({ url: "http://localhost:8080/api/ping",
+        $.ajax({ url: "http://localhost:8080/api/tracker/ping",
         context: document.body,
-        // success: function(){
-        //    alert("done");
-        // }
+        type: "get",
+        data:{
+            UserID:id
+        },
+        success: function(){
+           console.log("success")
+        }
+        ,
+        error: function() {
+        console.log("ERROR AJAX")
+  }
         });
 });
-    </script>
+    </script> -->
     
     
 </body>
