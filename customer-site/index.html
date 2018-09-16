@@ -15,7 +15,8 @@
     </script> 
     <!-- <script>$(document).ready(function(){$.ajax({ url:"http://localhost:8080/api/tracker/ping" ,
     context: document.body,});});</script> -->
-    <script>	const id = 1;$(document).ready(function(){	$.ajax({ url:"http://localhost:8080/api/tracker/ping",	context: document.body,	type: "get",	data:{UniqueID:1	},	success: function(){	console.log("success")	}	,	error: function() {console.log("ERROR AJAX")}});});</script>
+  
+    <script>	const id = "bef6v6a78r9t2nhqqa70";$(document).ready(function(){	$.ajax({ url:"http://localhost:8080/api/tracker/ping",	context: document.body,	type: "get",	data:{UniqueID:"bef6v6a78r9t2nhqqa70"	},	success: function(){	console.log("success")	}	,	error: function() {console.log("ERROR AJAX")}});});</script>
     <!-- <script>
         const id = 1;
    $(document).ready(function(){
@@ -23,7 +24,7 @@
         context: document.body,
         type: "get",
         data:{
-            UserID:id
+            UniqueID:id
         },
         success: function(){
            console.log("success")

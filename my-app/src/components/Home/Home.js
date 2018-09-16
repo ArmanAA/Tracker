@@ -1,13 +1,18 @@
 import React, { Component } from "react";
 import Signup from "../Signup/Signup";
+
+const divStyle = {
+  textAlign: "center",
+  color: "blue"
+};
 class Home extends Component {
-  constructor(props) {
-    super(props);
-  }
   render() {
     return (
       <div>
-        <h1>Hello</h1>
+        <div style={divStyle}>
+          <h1>Welcome To Tracker!</h1>
+        </div>
+
         <Signup />
       </div>
     );

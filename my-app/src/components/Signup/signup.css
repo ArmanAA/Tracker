@@ -1,0 +1,51 @@
+.simple{
+    text-align: center;  
+    font-family: 'Montserrat', sans-serif;  
+    margin: 100px 400px;
+}
+
+ .signup-input {
+    font-family: 'Montserrat', sans-serif;  
+    width: 50%;
+    padding: 10px 40px;
+    margin: 8px 0;
+    box-sizing: border-box;
+} 
+#form-style {
+    
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 50px 0px;
+}
+ button{
+    width: 250px;
+    padding: 10px;
+    border-radius: 5px;
+    color:#e14594;
+    font-family: 'Montserrat', sans-serif;  
+    background-color:#2b3595;
+    
+} 
+ label {
+    display: inline-block;
+    position: relative;
+    box-align: relative;
+    width: 140px;
+    text-align: center;
+  }​
+  input{
+    display:inline;
+    }
+textarea {
+    position:relative;
+    max-width: 100%;
+    height: auto;
+    width: auto\9; /* ie8 */
+     width: 600px;
+    height:400px;
+} 
+.modal{
+    width: 10%;
+    margin: auto;
+  }
