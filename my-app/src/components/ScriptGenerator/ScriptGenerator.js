@@ -52,6 +52,10 @@ class ScriptGenerator extends Component {
       })
         .then(res => {
           if (!res.ok) {
+            if (res.status === 400) {
+              this.setState({ show: true });
+              this.setState({ message: "This URL has already been tagged." });
+            }
           } else {
             res.json().then(json => {
               this.setState({ script: json.message });

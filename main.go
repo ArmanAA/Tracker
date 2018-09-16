@@ -165,10 +165,16 @@ func main() {
 			userId := getUserID(scriptJson.Username, *db)
 			if userId != 0 {
 				registeredWeb := registerWebsite(scriptJson.Url, userId, *db)
-				script := generateScript(registeredWeb.UniqueID)
-				c.JSON(200, gin.H{
-					"message": script,
-				})
+				if registeredWeb.URL != "" {
+					fmt.Println("url for that bitch is:", registeredWeb.URL)
+					script := generateScript(registeredWeb.UniqueID)
+					c.JSON(200, gin.H{
+						"message": script,
+					})
+				} else {
+					c.JSON(http.StatusBadRequest, gin.H{})
+				}
+
 			} else {
 				c.JSON(http.StatusNotAcceptable, gin.H{})
 			}
@@ -307,13 +313,21 @@ func getUser(username string, db gorm.DB) User {
 
 func registerWebsite(url string, userId uint, db gorm.DB) RegisteredWebsites {
 	uniqueID := genXid(db)
+	var count int
+	regWeb := RegisteredWebsites{}
+	emptyRegWeb := RegisteredWebsites{}
 	registerWeb := RegisteredWebsites{
 		URL:      url,
 		UniqueID: uniqueID,
 		UserID:   userId,
 	}
-	db.Create(&registerWeb)
-	return registerWeb
+	db.Debug().Where("url = ?", url).Find(&regWeb).Count(&count)
+	if count == 0 {
+		db.Create(&registerWeb)
+		return registerWeb
+	}
+	return emptyRegWeb
+
 }
 
 func genXid(db gorm.DB) string {
