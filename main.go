@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
 	"strconv"
 
 	"github.com/gin-contrib/cors"
@@ -13,8 +12,6 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 	"github.com/rs/xid"
-
-	//	"encoding/json"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -47,17 +44,30 @@ type ScriptGetter struct {
 	Url      string `json:"url"`
 }
 
+type TimeInterval struct {
+	Username  string `json:"username"`
+	Url       string `json:"url"`
+	StartTime string `json:"startTime"`
+	EndTime   string `json:"endTime"`
+}
+type TrackOutput struct {
+	Url   string
+	Count int
+}
+
 func main() {
 
 	router := gin.Default()
 	router.Use(cors.Default())
+	//handles requests from dashboard
 	apiDash := router.Group("api/dash")
+	//handles requests from tacked paged
 	apiTracker := router.Group("/api/tracker")
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// <------*****       DB stuff       *****------->
-
+	//Set up database
 	db, err := gorm.Open("mysql", "root:root@/trackerdb?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		panic(err.Error())
@@ -65,51 +75,13 @@ func main() {
 	}
 
 	err = db.DB().Ping()
-	//db.DropTableIfExists(&User{})
-	//db.DropTableIfExists(&User{}, &RegisteredWebsites{}, &TrackStatus{})
 	db.AutoMigrate(&User{}, &RegisteredWebsites{}, &TrackStatus{})
-	// myuser := User{
-	// 	Username: "arman",
-	// 	Password: "helloworld",
-	// 	Email:    "arman@yahoo.com",
-	// }
-	// website := RegisteredWebsites{
-	// 	UniqueID: "1223",
-	// 	URL:      "youtube.com",
-	// 	UserID:   1,
-	// }
-	// websitefb := RegisteredWebsites{
-	// 	UniqueID: "1111",
-	// 	URL:      "facebook.com",
-	// 	UserID:   1,
-	// }
-	// fbtrack := TrackStatus{
-	// 	UserAgent: "Mozilla",
-	// 	UniqueID:  "1111",
-	// }
-	// fbtrack1 := TrackStatus{
-	// 	UserAgent: "Mozilla",
-	// 	UniqueID:  "1223",
-	// }
-	// fbtrack2 := TrackStatus{
-	// 	UserAgent: "Chrome",
-	// 	UniqueID:  "1111",
-	// }
-	// db.Create(&myuser)
-	// db.Create(&fbtrack)
-	// db.Create(&fbtrack1)
-	// db.Create(&fbtrack2)
-	// db.Create(&website)
-	// db.Create(&websitefb)
-	//	getWebTracks(1, *db)
-	// if !db.HasTable(&User{}) {
-	// 	db.CreateTable(&User{})
-	// }
 
 	defer db.Close()
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//<------****	Dashboard API 	//<------****
+	//sign up handler
 	apiDash.POST("/signup", func(c *gin.Context) {
 		var user User
 
@@ -120,7 +92,6 @@ func main() {
 
 				hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 				if err != nil {
-					// TODO: Properly handle error
 					log.Fatal(err)
 				}
 				user.Password = string(hash)
@@ -135,6 +106,7 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{})
 		}
 	})
+	//log in handler
 	apiDash.PUT("/login", func(c *gin.Context) {
 		var loginJson loginData
 
@@ -143,10 +115,6 @@ func main() {
 			if checkCredentials(loginJson.Username, loginJson.Password, *db) {
 
 				user := getUser(loginJson.Username, *db)
-				// cookie = &http.Cookie{
-				// 	Name:  "logged-in",
-				// 	Value: "1",
-				// }
 				c.JSON(http.StatusOK, gin.H{
 					"userID":   user.ID,
 					"username": user.Username,
@@ -159,6 +127,7 @@ func main() {
 		}
 
 	})
+	//register websites handler
 	apiDash.POST("/registerwebsite", func(c *gin.Context) {
 		var scriptJson ScriptGetter
 		if err := c.BindJSON(&scriptJson); err == nil {
@@ -166,7 +135,6 @@ func main() {
 			if userId != 0 {
 				registeredWeb := registerWebsite(scriptJson.Url, userId, *db)
 				if registeredWeb.URL != "" {
-					fmt.Println("url for that bitch is:", registeredWeb.URL)
 					script := generateScript(registeredWeb.UniqueID)
 					c.JSON(200, gin.H{
 						"message": script,
@@ -183,6 +151,7 @@ func main() {
 		}
 
 	})
+	//getting report handler
 	apiDash.GET("/webtrackhistory/:username", func(c *gin.Context) {
 		username := c.Param("username")
 		id := getUserID(username, *db)
@@ -192,6 +161,7 @@ func main() {
 			"message": outputTracks,
 		})
 	})
+	//page view over time interval handler
 	apiDash.POST("/tracktimeinterval", func(c *gin.Context) {
 		var timeInterval TimeInterval
 
@@ -214,7 +184,7 @@ func main() {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	//<------****/		Tracker API  	//<------****
-
+	//handling pings when a tracked page is viewed
 	apiTracker.GET("/ping", func(c *gin.Context) {
 		var track TrackStatus
 		fmt.Println("in ping")
@@ -236,13 +206,7 @@ func main() {
 	router.Run() // listen and serve on 0.0.0.0:8080
 }
 
-type TimeInterval struct {
-	Username  string `json:"username"`
-	Url       string `json:"url"`
-	StartTime string `json:"startTime"`
-	EndTime   string `json:"endTime"`
-}
-
+//
 func checkCredentials(username string, password string, db gorm.DB) bool {
 	user := User{}
 	db.Debug().Where("username = ? ", username).Find(&user)
@@ -251,7 +215,7 @@ func checkCredentials(username string, password string, db gorm.DB) bool {
 		hashFromDatabase := []byte(user.Password)
 		// Comparing the password with the hash
 		if err := bcrypt.CompareHashAndPassword(hashFromDatabase, []byte(password)); err != nil {
-			// TODO: Properly handle error
+
 			log.Fatal(err)
 			return false
 		} else {
@@ -263,10 +227,7 @@ func checkCredentials(username string, password string, db gorm.DB) bool {
 
 }
 
-type TrackOutput struct {
-	Url   string
-	Count int
-}
+// Helper Functions ---->
 
 func getPageViewInTimeInterval(startTime string, endTime string, userId uint, url string, db gorm.DB) int {
 	var count int
@@ -280,7 +241,6 @@ func getPageViewInTimeInterval(startTime string, endTime string, userId uint, ur
 }
 
 func getWebTracks(userId uint, db gorm.DB) []TrackOutput {
-	//m := make(map[string]string)
 	var count int
 	outputs := []TrackOutput{}
 	registeredWebs := []RegisteredWebsites{}
@@ -321,7 +281,7 @@ func registerWebsite(url string, userId uint, db gorm.DB) RegisteredWebsites {
 		UniqueID: uniqueID,
 		UserID:   userId,
 	}
-	db.Debug().Where("url = ?", url).Find(&regWeb).Count(&count)
+	db.Debug().Where("url = ? AND user_id = ?", url, userId).Find(&regWeb).Count(&count)
 	if count == 0 {
 		db.Create(&registerWeb)
 		return registerWeb

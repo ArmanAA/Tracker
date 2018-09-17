@@ -1,15 +1,8 @@
 import React, { Component } from "react";
-//import Griddle, { plugins, RowDefinition, ColumnDefinition} from 'griddle-react';
 import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
 import TimeInterval from "../Modals/TimeInterval";
-import Calendar from "react-calendar";
-
 import moment from "moment";
-import styles from "../Signup/signup.css";
-//import DateTimePicker from "react-datetime-picker";
-
-//import { DatetimePicker } from "rc-datetime-picker";
-//const JsonTable = require("ts-react-json-table");
+import styles from "../../Styles/style.css";
 
 class UserHistory extends Component {
   constructor(props) {
@@ -42,13 +35,6 @@ class UserHistory extends Component {
         this.setState({ data: results.message });
       });
   }
-
-  //   renderHistory = () => {
-  //     return (
-
-  //     )
-  //   }
-  // };
   handleChange = moment => {
     this.setState({
       moment
@@ -77,10 +63,13 @@ class UserHistory extends Component {
     };
     return (
       <div>
-        <h1>Tracked Webs History {this.state.username}</h1>
+        <h1 className={styles.h1Tag}>Tracked Webs Report</h1>
+        <h4 className={styles.h4Tag}>
+          Click the a row to see page views for a specified time frame.
+        </h4>
 
         <BootstrapTable
-          class="table table-striped"
+          className={"table table-bordered table-hover " + styles.table}
           data={this.state.data}
           options={options}
         >

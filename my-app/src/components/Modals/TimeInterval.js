@@ -1,9 +1,15 @@
 import React from "react";
 import Modal from "react-responsive-modal";
 import Datetime from "react-datetime";
-import styles from "../Signup/signup.css";
+import styles from "../../Styles/style.css";
+import ErrorMessage from "./ErrorMessage";
+//import styles from "../../Styles/style.css";
 import moment from "moment";
-
+const modalStyle = {
+  modal: {
+    width: "60%"
+  }
+};
 const divStyle = {
   fontFamily: "sans-serif",
   textAlign: "center",
@@ -20,7 +26,9 @@ class TimeInterval extends React.Component {
       username: props.username,
       url: props.url,
       pageViewCount: "",
-      show: false
+      show: false,
+      showMessage: false,
+      message: ""
     };
   }
 
@@ -29,8 +37,14 @@ class TimeInterval extends React.Component {
   };
 
   onCloseModal = () => {
-    this.setState({ show: false });
     this.setState({ open: false });
+  };
+  onOpenMessageModal = () => {
+    this.setState({ showMessage: true });
+  };
+
+  onCloseMessageModal = () => {
+    this.setState({ showMessage: false });
   };
   componentWillUpdate() {}
   handleStartDate = date => {
@@ -48,14 +62,15 @@ class TimeInterval extends React.Component {
 
     //alert(this.state.startDate);
   };
-  showPageViews = () => {
-    if (this.state.show) {
+  renderMessage = () => {
+    if (this.state.showMessage) {
       return (
-        <p>
-          {" "}
-          The Pageviews for {this.state.url} from {this.state.startTime}
-          to {this.state.endTime} is {this.state.pageViewCount}
-        </p>
+        <ErrorMessage
+          styles={modalStyle}
+          show={this.state.showMessage}
+          onClose={this.onCloseMessageModal}
+          message={this.state.message}
+        />
       );
     }
   };
@@ -78,7 +93,14 @@ class TimeInterval extends React.Component {
           res.json().then(json => {
             this.setState({ pageViewCount: json.count });
             console.log(json);
-            this.setState({ show: true });
+            this.setState({
+              message:
+                this.state.pageViewCount +
+                " Pageview for " +
+                this.state.url +
+                " during that time."
+            });
+            this.setState({ showMessage: true });
           });
         }
       })
@@ -89,19 +111,30 @@ class TimeInterval extends React.Component {
     return (
       <div styles={divStyle}>
         <Modal
+          styles={modalStyle}
           open={this.props.show}
           onClose={this.props.onClose}
           message={this.props.message}
           center
         >
           <label>Start Time</label>
+          {/* <input
+            type="date"
+            id="start"
+            name="trip"
+            value="2018-07-22"
+            min="2018-01-01"
+            max="2018-12-31"
+          /> */}
           <Datetime onChange={this.handleStartDate} />
           <br />
           <label>End Time</label>
           <Datetime onChange={this.handleEndDate} />
           <br />
-          <button onClick={e => this.onSubmit(e)}>Submit</button>
-          {this.showPageViews()}
+          <button className={styles.button} onClick={e => this.onSubmit(e)}>
+            Submit
+          </button>
+          {this.renderMessage()}
         </Modal>
       </div>
     );

@@ -1,10 +1,16 @@
 import React, { Component } from "react";
-import styles from "./signup.css";
+import styles from "../../Styles/style.css";
 import ErrorMessage from "../Modals/ErrorMessage";
 import { Redirect } from "react-router-dom";
 
 var validator = require("validator");
-
+const registerButtonStyle = {
+  marginTop: "50px"
+};
+const loginButtonStyle = {
+  marginTop: "50px",
+  marginRight: "40px"
+};
 class Signup extends Component {
   constructor(props) {
     super(props);
@@ -63,7 +69,7 @@ class Signup extends Component {
       }
     } else {
       this.setState({
-        message: "Please complete all fields shown on the sign up form."
+        message: "Please complete all fields shown on the sign up form. "
       });
       this.handleShow();
       return false;
@@ -155,9 +161,13 @@ class Signup extends Component {
           />
           <br />
           {this.renderRedirect()}
-          <label htmlFor="loginButton">Already have an account?</label>
-          <button onClick={e => this.toLogin(e)}>Log In Here</button>
-          <button onClick={e => this.onSubmit(e)}>Register</button>
+          {/* <label htmlFor="loginButton">Already have an account?</label> */}
+          <button className={styles.buttonHome} onClick={e => this.toLogin(e)}>
+            Log In
+          </button>
+          <button className={styles.buttonHome} onClick={e => this.onSubmit(e)}>
+            Register
+          </button>
         </form>
       </div>
     );

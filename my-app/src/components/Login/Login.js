@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import styles from "../Signup/signup.css";
+import styles from "../../Styles/style.css";
 import ErrorMessage from "../Modals/ErrorMessage";
 import { Redirect } from "react-router-dom";
 
 const DIVSTYLE = {
-  textAlign: "center", // <-- the magic
+  textAlign: "center",
   fontWeight: "bold",
   fontSize: 30,
   color: "blue"
@@ -91,11 +91,11 @@ class Login extends Component {
   };
   render() {
     return (
-      <div>
-        <h1>Log in Page!</h1>
-
+      <div className={styles.BackGroundImageLogin}>
         <form id={styles["form-style"]}>
-          <label htmlFor="Username:">Username</label>
+          <label className={styles.font} htmlFor="Username:">
+            Username
+          </label>
           <input
             className={styles["signup-input"]}
             name="username"
@@ -104,7 +104,9 @@ class Login extends Component {
             onChange={e => this.change(e)}
           />
           <br />
-          <label htmlFor="Password:">Password</label>
+          <label className={styles.font} htmlFor="Password:">
+            Password
+          </label>
           <input
             className={styles["signup-input"]}
             name="password"
@@ -115,7 +117,9 @@ class Login extends Component {
           />
         </form>
         <div style={DIVSTYLE}>
-          <button onClick={e => this.onSubmit(e)}>Login</button>
+          <button className={styles.button} onClick={e => this.onSubmit(e)}>
+            Login
+          </button>
         </div>
         {this.showError()}
         {this.renderRedirect()}
