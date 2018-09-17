@@ -1,10 +1,17 @@
 language: go
 go:
     - 1.8.x
+env:
+  global:
+    - GOLANGCI_LINT_VERSION=v1.10.2
 install:
     - 'go get -u github.com/gin-contrib/cors'
     - 'go get -u github.com/gin-gonic/gin'
     - 'go get -u github.com/go-sql-driver/mysql'
+before_install:
+    - curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | bash -s -- -b $GOPATH/bin $GOLANGCI_LINT_VERSION
+before_script:
+    - golangci-lint run
 script:
     - 'echo "Running tests!!"'
 after_success:
