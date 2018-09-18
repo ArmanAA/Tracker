@@ -56,28 +56,6 @@ class TimeInterval extends React.Component {
     }
   };
 
-  // onSubmit = e => {
-  //   e.preventDefault();
-
-  //   fetch("http://localhost:8080/api/dash/tracktimeinterval", {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify(this.state)
-  //   })
-  //     .then(results => results.json())
-  //     .then(results => {
-  //       this.setState({ newData: results.message });
-  //       console.log(this.state.newData);
-  //       // this.setState({ redirect: true });
-  //     });
-  // };
-  // renderRedirect = () => {
-  //   if (this.state.redirect) {
-  //     let myurl = "/report/" + this.state.username + "/" + this.state.url;
-
-  //     return <Redirect to={myurl} />;
-  //   }
-  // };
   render() {
     return (
       <div styles={divStyle}>
