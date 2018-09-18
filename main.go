@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -79,7 +79,7 @@ func main() {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// <------*****       DB stuff       *****------->
 	//Set up database
-	db, err := gorm.Open("sqlite3", "./db/gorm.db")
+	db, err := gorm.Open("sqlite3", "./db/test.db")
 	if err != nil {
 		panic(err.Error())
 
@@ -199,17 +199,16 @@ func main() {
 			for _, element := range timeInterval.UrlCount {
 				registeredWeb := getRegisteredWeb(element.Url, id, *db)
 				if registeredWeb.UniqueID == "" {
-					fmt.Println("path==== ", element.Url)
+
 					count := getPVPathInTimeInterval(timeInterval.StartTime, timeInterval.EndTime, element.Url, *db)
 					outputs = append(outputs, TrackOutput{Url: element.Url, Count: count})
+
 				} else {
-					fmt.Println("domain==== ", element.Url)
+
 					count := getPVWebInTimeInterval(timeInterval.StartTime, timeInterval.EndTime, registeredWeb.UniqueID, *db)
 					outputs = append(outputs, TrackOutput{Url: element.Url, Count: count})
 				}
-
 			}
-
 			c.JSON(http.StatusAccepted, gin.H{
 				"message": outputs,
 			})
@@ -322,13 +321,29 @@ func checkCredentials(username string, password string, db gorm.DB) bool {
 func getPVPathInTimeInterval(startTime string, endTime string, path string, db gorm.DB) int {
 	var count int
 
-	db.Debug().Model(&TrackStatus{}).Where("created_at BETWEEN ? AND ? AND path = ? ", startTime, endTime, path).Count(&count)
+	start, _ := time.Parse(
+		time.RFC3339,
+		startTime)
+
+	end, _ := time.Parse(
+		time.RFC3339,
+		endTime)
+
+	db.Debug().Model(&TrackStatus{}).Where("created_at BETWEEN ? AND ? AND path = ? ", start, end, path).Count(&count)
 	return count
 
 }
 func getPVWebInTimeInterval(startTime string, endTime string, path string, db gorm.DB) int {
 	var count int
-	db.Debug().Model(&TrackStatus{}).Where("created_at BETWEEN ? AND ? AND unique_id = ? ", startTime, endTime, path).Count(&count)
+	start, _ := time.Parse(
+		time.RFC3339,
+		startTime)
+
+	end, _ := time.Parse(
+		time.RFC3339,
+		endTime)
+
+	db.Debug().Model(&TrackStatus{}).Where("created_at BETWEEN ? AND ? AND unique_id = ? ", start, end, path).Count(&count)
 	return count
 
 }

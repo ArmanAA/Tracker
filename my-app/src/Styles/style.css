@@ -26,7 +26,8 @@ header{
    
   }
   .buttonCenter{
-      text-align: center;
+    text-align: center;
+    margin-top: 40px;
     width: 250px;
     padding: 10px;
     border-radius: 5px;
@@ -96,10 +97,10 @@ textarea {
     width: 100%;
     padding: 10px 40px;
     margin: 8px 0;
-    color: aliceblue;
+    color:black;
     font-size: 22px;
     box-sizing: border-box;
-    background-color: rgb(77, 33, 78,0.38);
+    background-color: rgba(228, 167, 87, 0.38);
     
     
 } 

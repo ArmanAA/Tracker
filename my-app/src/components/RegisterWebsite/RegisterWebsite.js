@@ -3,7 +3,6 @@ import styles from "../../Styles/style.css";
 import { Redirect } from "react-router-dom";
 import ErrorMessage from "../Modals/ErrorMessage";
 
-var validator = require("validator");
 const divStyle = {
   margin: "0 auto",
   width: "50%"
@@ -66,7 +65,6 @@ class RegisterWebsite extends Component {
                 message: "Website successfully registered."
               });
               this.setState({ show: true });
-              console.log("Success");
             });
           }
         })

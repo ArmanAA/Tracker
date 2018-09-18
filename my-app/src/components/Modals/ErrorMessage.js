@@ -1,13 +1,6 @@
 import React from "react";
 import Modal from "react-responsive-modal";
 import styles from "../../Styles/style.css";
-
-const modalStyle = {
-  modal: {
-    width: "100%",
-    height: "20%"
-  }
-};
 class ErrorMessage extends React.Component {
   constructor(props) {
     super(props);
@@ -22,7 +15,6 @@ class ErrorMessage extends React.Component {
 
   onCloseModal = () => {
     this.setState({ open: false });
-    //this.componentWillUpdate();
   };
   componentWillUpdate() {}
   render() {
