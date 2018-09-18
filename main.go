@@ -85,7 +85,7 @@ func main() {
 
 	}
 	err = db.DB().Ping()
-	db.DropTableIfExists(&User{}, &RegisteredWebsites{}, &TrackStatus{}, &Path{})
+	//db.DropTableIfExists(&User{}, &RegisteredWebsites{}, &TrackStatus{}, &Path{})
 	db.AutoMigrate(&User{}, &RegisteredWebsites{}, &TrackStatus{}, &Path{})
 
 	defer db.Close()
@@ -286,7 +286,7 @@ func main() {
 			UniqueID:  unique_id,
 			UserAgent: user_agent,
 		}
-		fmt.Println("path===", track.Path)
+
 		db.Debug().Create(&track)
 
 		c.JSON(200, gin.H{
@@ -347,14 +347,17 @@ func getWebTracks(userId uint, db gorm.DB) []TrackOutput {
 func getPathTracks(unique_id string, db gorm.DB) []TrackOutput {
 	var count int
 	outputs := []TrackOutput{}
-	tempPath := Path{}
-	db.Model(&Path{}).Where("unique_id = ?", unique_id).Find(&tempPath)
-	if tempPath.UniqueID != "" {
-		db.Model(&TrackStatus{}).Where("unique_id = ?", tempPath.UniqueID).Count(&count)
-		webURL := getWebURL(unique_id, db)
-		outputs = append(outputs, TrackOutput{Url: webURL, Count: count})
-		db.Model(&TrackStatus{}).Where("path = ?", tempPath.Path).Count(&count)
-		outputs = append(outputs, TrackOutput{Url: tempPath.Path, Count: count})
+	tempPathObjects := []Path{}
+
+	db.Model(&TrackStatus{}).Where("unique_id = ?", unique_id).Count(&count)
+	webURL := getWebURL(unique_id, db)
+	outputs = append(outputs, TrackOutput{Url: webURL, Count: count})
+
+	db.Model(&Path{}).Where("unique_id = ?", unique_id).Find(&tempPathObjects)
+
+	for _, element := range tempPathObjects {
+		db.Model(&TrackStatus{}).Where("path = ?", element.Path).Count(&count)
+		outputs = append(outputs, TrackOutput{Url: element.Path, Count: count})
 	}
 
 	return outputs
@@ -425,8 +428,7 @@ func genXid(db gorm.DB) string {
 func generateScript(uniqueId string) string {
 	id := uniqueId
 	url := "\"http://localhost:8080/api/tracker/ping\""
-	script := "<script>	const id = " + "\"" + id + "\"" + ";$(document).ready(function(){	$.ajax({ url:" + url + ",	context: document.body,	type: \"get\",	data:{UniqueID:" + "\"" + id + "\"" + ", path: window.encodeURIComponent(window.location.pathname)" + "	},	success: function(){	console.log(\"success\")	}	,	error: function() {console.log(\"ERROR AJAX\")}});});</script>"
-	//<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	script := "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js\"> </script>  <script>	const id = " + "\"" + id + "\"" + ";$(document).ready(function(){	$.ajax({ url:" + url + ",	context: document.body,	type: \"get\",	data:{UniqueID:" + "\"" + id + "\"" + ", path: window.encodeURIComponent(window.location.pathname)" + "	},	success: function(){	console.log(\"success\")	}	,	error: function() {console.log(\"ERROR AJAX\")}});});</script>"
 	return script
 }
 
