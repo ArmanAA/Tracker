@@ -143,10 +143,6 @@ class ScriptGenerator extends Component {
   render() {
     return (
       <div>
-        <h1>
-          In TrackHistory for user: {this.state.username} and url:{" "}
-          {this.state.url}{" "}
-        </h1>
         <div>
           <ErrorMessage
             show={this.state.show}

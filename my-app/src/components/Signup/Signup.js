@@ -4,13 +4,7 @@ import ErrorMessage from "../Modals/ErrorMessage";
 import { Redirect } from "react-router-dom";
 
 var validator = require("validator");
-const registerButtonStyle = {
-  marginTop: "50px"
-};
-const loginButtonStyle = {
-  marginTop: "50px",
-  marginRight: "40px"
-};
+
 class Signup extends Component {
   constructor(props) {
     super(props);
@@ -96,13 +90,9 @@ class Signup extends Component {
                 message: "The user name you have entered is already in use."
               });
               this.setState({ show: true });
-              //alert(this.state.status);
-              // this.componentWillUpdate();
             }
-            console.log("Failure: ", JSON.stringify(res.status));
           } else {
             this.setRedirect();
-            console.log("Success: ", JSON.stringify(res.status));
           }
         })
 
@@ -160,7 +150,7 @@ class Signup extends Component {
           />
           <br />
           {this.renderRedirect()}
-          {/* <label htmlFor="loginButton">Already have an account?</label> */}
+
           <button className={styles.buttonHome} onClick={e => this.toLogin(e)}>
             Log In
           </button>

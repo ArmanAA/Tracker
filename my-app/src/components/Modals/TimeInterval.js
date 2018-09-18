@@ -3,9 +3,6 @@ import Modal from "react-responsive-modal";
 import Datetime from "react-datetime";
 import styles from "../../Styles/style.css";
 import moment from "moment";
-import Report from "../Report/Report";
-import { Link } from "react-router-dom";
-import { Redirect } from "react-router-dom";
 const modalStyle = {
   modal: {
     width: "60%"

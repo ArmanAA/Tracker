@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
-import TimeInterval from "../Modals/TimeInterval";
 import moment from "moment";
 import styles from "../../Styles/style.css";
 import { Redirect } from "react-router-dom";
@@ -34,18 +33,6 @@ class UserHistory extends Component {
     });
   };
 
-  // showTimeInterval = () => {
-  //   if (this.state.show) {
-  //     return (
-  //       <TimeInterval
-  //         url={this.state.url}
-  //         username={this.state.username}
-  //         show={this.state.show}
-  //         onClose={this.handleClose}
-  //       />
-  //     );
-  //   }
-  // };
   renderRedirect = () => {
     if (this.state.redirect) {
       let myurl = "/tracks/" + this.state.username + "/" + this.state.url;
@@ -80,7 +67,6 @@ class UserHistory extends Component {
             Total Page Views
           </TableHeaderColumn>
         </BootstrapTable>
-        {/* {this.showTimeInterval()} */}
         {this.renderRedirect()}
         <div />
       </div>

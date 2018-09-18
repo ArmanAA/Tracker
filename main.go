@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"net/url"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -78,13 +79,13 @@ func main() {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// <------*****       DB stuff       *****------->
 	//Set up database
-	db, err := gorm.Open("sqlite3", "./db/gorm.db")
+	db, err := gorm.Open("sqlite3", "./db/test.db")
 	if err != nil {
 		panic(err.Error())
 
 	}
 	err = db.DB().Ping()
-	db.DropTableIfExists(&User{}, &RegisteredWebsites{}, &TrackStatus{}, &Path{})
+	//db.DropTableIfExists(&User{}, &RegisteredWebsites{}, &TrackStatus{}, &Path{})
 	db.AutoMigrate(&User{}, &RegisteredWebsites{}, &TrackStatus{}, &Path{})
 
 	defer db.Close()
@@ -198,17 +199,16 @@ func main() {
 			for _, element := range timeInterval.UrlCount {
 				registeredWeb := getRegisteredWeb(element.Url, id, *db)
 				if registeredWeb.UniqueID == "" {
-					fmt.Println("path==== ", element.Url)
+
 					count := getPVPathInTimeInterval(timeInterval.StartTime, timeInterval.EndTime, element.Url, *db)
 					outputs = append(outputs, TrackOutput{Url: element.Url, Count: count})
+
 				} else {
-					fmt.Println("domain==== ", element.Url)
+
 					count := getPVWebInTimeInterval(timeInterval.StartTime, timeInterval.EndTime, registeredWeb.UniqueID, *db)
 					outputs = append(outputs, TrackOutput{Url: element.Url, Count: count})
 				}
-
 			}
-
 			c.JSON(http.StatusAccepted, gin.H{
 				"message": outputs,
 			})
@@ -268,23 +268,26 @@ func main() {
 	})
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	//for loop query paths
+	//
 	//<------****/		Tracker API  	//<------****
 	//handling pings when a tracked page is viewed
 	apiTracker.GET("/ping", func(c *gin.Context) {
 		var track TrackStatus
 
-		if err := c.Bind(&track); err == nil {
-			path := track.Path
-			unique_id := track.UniqueID
-			user_agent := c.Request.Header.Get("User-Agent")
-			track := TrackStatus{
-				Path:      path,
-				UniqueID:  unique_id,
-				UserAgent: user_agent,
-			}
-			db.Debug().Create(&track)
+		path := c.Request.URL.Query().Get("path")
+		in, _ := url.QueryUnescape(path)
+		unique_id := c.Request.URL.Query().Get("UniqueID")
+		user_agent := c.Request.Header.Get("User-Agent")
+
+		track = TrackStatus{
+			Path:      in,
+			UniqueID:  unique_id,
+			UserAgent: user_agent,
 		}
+
+		db.Debug().Create(&track)
+
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
@@ -318,13 +321,29 @@ func checkCredentials(username string, password string, db gorm.DB) bool {
 func getPVPathInTimeInterval(startTime string, endTime string, path string, db gorm.DB) int {
 	var count int
 
-	db.Debug().Model(&TrackStatus{}).Where("created_at BETWEEN ? AND ? AND path = ? ", startTime, endTime, path).Count(&count)
+	start, _ := time.Parse(
+		time.RFC3339,
+		startTime)
+
+	end, _ := time.Parse(
+		time.RFC3339,
+		endTime)
+
+	db.Debug().Model(&TrackStatus{}).Where("created_at BETWEEN ? AND ? AND path = ? ", start, end, path).Count(&count)
 	return count
 
 }
 func getPVWebInTimeInterval(startTime string, endTime string, path string, db gorm.DB) int {
 	var count int
-	db.Debug().Model(&TrackStatus{}).Where("created_at BETWEEN ? AND ? AND unique_id = ? ", startTime, endTime, path).Count(&count)
+	start, _ := time.Parse(
+		time.RFC3339,
+		startTime)
+
+	end, _ := time.Parse(
+		time.RFC3339,
+		endTime)
+
+	db.Debug().Model(&TrackStatus{}).Where("created_at BETWEEN ? AND ? AND unique_id = ? ", start, end, path).Count(&count)
 	return count
 
 }
@@ -343,14 +362,17 @@ func getWebTracks(userId uint, db gorm.DB) []TrackOutput {
 func getPathTracks(unique_id string, db gorm.DB) []TrackOutput {
 	var count int
 	outputs := []TrackOutput{}
-	tempPath := Path{}
-	db.Model(&Path{}).Where("unique_id = ?", unique_id).Find(&tempPath)
-	if tempPath.UniqueID != "" {
-		db.Model(&TrackStatus{}).Where("unique_id = ?", tempPath.UniqueID).Count(&count)
-		webURL := getWebURL(unique_id, db)
-		outputs = append(outputs, TrackOutput{Url: webURL, Count: count})
-		db.Model(&TrackStatus{}).Where("path = ?", tempPath.Path).Count(&count)
-		outputs = append(outputs, TrackOutput{Url: tempPath.Path, Count: count})
+	tempPathObjects := []Path{}
+
+	db.Model(&TrackStatus{}).Where("unique_id = ?", unique_id).Count(&count)
+	webURL := getWebURL(unique_id, db)
+	outputs = append(outputs, TrackOutput{Url: webURL, Count: count})
+
+	db.Model(&Path{}).Where("unique_id = ?", unique_id).Find(&tempPathObjects)
+
+	for _, element := range tempPathObjects {
+		db.Model(&TrackStatus{}).Where("path = ?", element.Path).Count(&count)
+		outputs = append(outputs, TrackOutput{Url: element.Path, Count: count})
 	}
 
 	return outputs
@@ -421,7 +443,7 @@ func genXid(db gorm.DB) string {
 func generateScript(uniqueId string) string {
 	id := uniqueId
 	url := "\"http://localhost:8080/api/tracker/ping\""
-	script := "<script>	const id = " + "\"" + id + "\"" + ";$(document).ready(function(){	$.ajax({ url:" + url + ",	context: document.body,	type: \"get\",	data:{UniqueID:" + "\"" + id + "\"" + ", path: window.encodeURIComponent(window.location.pathname)" + "	},	success: function(){	console.log(\"success\")	}	,	error: function() {console.log(\"ERROR AJAX\")}});});</script>"
+	script := "<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js\"> </script>  <script>	const id = " + "\"" + id + "\"" + ";$(document).ready(function(){	$.ajax({ url:" + url + ",	context: document.body,	type: \"get\",	data:{UniqueID:" + "\"" + id + "\"" + ", path: window.encodeURIComponent(window.location.pathname)" + "	},	success: function(){	console.log(\"success\")	}	,	error: function() {console.log(\"ERROR AJAX\")}});});</script>"
 	return script
 }
 

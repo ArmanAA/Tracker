@@ -80,7 +80,6 @@ class Login extends Component {
           this.setState({ show: true });
         } else {
           res.json().then(json => {
-            console.log(json);
             this.setState({ username: json.username });
             this.setRedirect();
           });

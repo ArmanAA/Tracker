@@ -3,8 +3,6 @@ import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
 import TimeInterval from "../Modals/TimeInterval";
 import moment from "moment";
 import styles from "../../Styles/style.css";
-import { Redirect } from "react-router-dom";
-import { Link } from "react-router";
 class Report extends Component {
   constructor(props) {
     super(props);
@@ -14,7 +12,8 @@ class Report extends Component {
       data: [],
       show: false,
       startTime: "",
-      endTime: ""
+      endTime: "",
+      homePageView: 0
     };
     this.handleShow = this.handleShow.bind(this);
     this.handleClose = this.handleClose.bind(this);
@@ -46,22 +45,10 @@ class Report extends Component {
       .then(results => results.json())
       .then(results => {
         this.setState({ data: results.message });
-        //  console.log(this.state.data);
+        // console.log(this.state.data);
       });
   }
-  //   showTimeInterval = () => {
-  //     if (this.state.show) {
-  //       return (
-  //         <TimeInterval
-  //           url={this.state.url}
-  //           username={this.state.username}
-  //           show={this.state.show}
-  //           onClose={this.handleClose}
-  //           data={this.state.data}
-  //         />
-  //       );
-  //     }
-  //   };
+
   onSubmit = e => {
     e.preventDefault();
 
@@ -72,8 +59,8 @@ class Report extends Component {
     })
       .then(results => results.json())
       .then(results => {
-        console.log(results.message);
         this.setState({ data: results.message });
+        console.log(this.state.data);
       });
   };
   showScript = e => {
