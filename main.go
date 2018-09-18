@@ -5,12 +5,11 @@ import (
 	"log"
 	"net/http"
 
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
-
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	_ "github.com/lib/pq"
 	"github.com/rs/xid"
 	"golang.org/x/crypto/bcrypt"
