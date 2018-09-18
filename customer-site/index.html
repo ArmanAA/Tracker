@@ -13,17 +13,18 @@
 <script>
     document.getElementById("demo").innerHTML = "Hello JavaScript!";
     </script> 
-    <!-- <script>$(document).ready(function(){$.ajax({ url:"http://localhost:8080/api/tracker/ping" ,
-    context: document.body,});});</script> -->
-    <script>	const id = 1;$(document).ready(function(){	$.ajax({ url:"http://localhost:8080/api/tracker/ping",	context: document.body,	type: "get",	data:{UniqueID:1	},	success: function(){	console.log("success")	}	,	error: function() {console.log("ERROR AJAX")}});});</script>
-    <!-- <script>
+  <script>alert(window.location.pathname)</script>
+  
+  <script>	const id = "beg1ib278r9t9540b0cg";$(document).ready(function(){	$.ajax({ url:"http://localhost:8080/api/tracker/ping",	context: document.body,	type: "get",	data:{UniqueID:"beg1ib278r9t9540b0cg", path: window.encodeURIComponent(window.location.pathname)	},	success: function(){	console.log("success")	}	,	error: function() {console.log("ERROR AJAX")}});});</script>
+  <!-- <script>
         const id = 1;
    $(document).ready(function(){
         $.ajax({ url: "http://localhost:8080/api/tracker/ping",
         context: document.body,
         type: "get",
         data:{
-            UserID:id
+            UniqueID:id,
+            path: window.encodeURIComponent(window.location.pathname)
         },
         success: function(){
            console.log("success")
