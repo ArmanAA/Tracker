@@ -49,19 +49,7 @@ class Report extends Component {
         //  console.log(this.state.data);
       });
   }
-  //   showTimeInterval = () => {
-  //     if (this.state.show) {
-  //       return (
-  //         <TimeInterval
-  //           url={this.state.url}
-  //           username={this.state.username}
-  //           show={this.state.show}
-  //           onClose={this.handleClose}
-  //           data={this.state.data}
-  //         />
-  //       );
-  //     }
-  //   };
+
   onSubmit = e => {
     e.preventDefault();
 
