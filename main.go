@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -268,23 +269,26 @@ func main() {
 	})
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+	//for loop query paths
+	//
 	//<------****/		Tracker API  	//<------****
 	//handling pings when a tracked page is viewed
 	apiTracker.GET("/ping", func(c *gin.Context) {
 		var track TrackStatus
 
-		if err := c.Bind(&track); err == nil {
-			path := track.Path
-			unique_id := track.UniqueID
-			user_agent := c.Request.Header.Get("User-Agent")
-			track := TrackStatus{
-				Path:      path,
-				UniqueID:  unique_id,
-				UserAgent: user_agent,
-			}
-			db.Debug().Create(&track)
+		path := c.Request.URL.Query().Get("path")
+		in, _ := url.QueryUnescape(path)
+		unique_id := c.Request.URL.Query().Get("UniqueID")
+		user_agent := c.Request.Header.Get("User-Agent")
+
+		track = TrackStatus{
+			Path:      in,
+			UniqueID:  unique_id,
+			UserAgent: user_agent,
 		}
+		fmt.Println("path===", track.Path)
+		db.Debug().Create(&track)
+
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
@@ -422,6 +426,7 @@ func generateScript(uniqueId string) string {
 	id := uniqueId
 	url := "\"http://localhost:8080/api/tracker/ping\""
 	script := "<script>	const id = " + "\"" + id + "\"" + ";$(document).ready(function(){	$.ajax({ url:" + url + ",	context: document.body,	type: \"get\",	data:{UniqueID:" + "\"" + id + "\"" + ", path: window.encodeURIComponent(window.location.pathname)" + "	},	success: function(){	console.log(\"success\")	}	,	error: function() {console.log(\"ERROR AJAX\")}});});</script>"
+	//<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	return script
 }
 
