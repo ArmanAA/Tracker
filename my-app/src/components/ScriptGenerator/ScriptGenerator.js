@@ -157,7 +157,7 @@ class ScriptGenerator extends Component {
           </label>
           <input
             className={styles["signup-input"]}
-            placeholder="Domain name..."
+            placeholder="Enter Path..."
             name="pathName"
             value={this.state.webURL}
             onChange={e => this.change(e)}

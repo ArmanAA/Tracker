@@ -111,7 +111,7 @@ class RegisterWebsite extends Component {
           </label>
           <input
             className={styles["signup-input"]}
-            placeholder="Domain name"
+            placeholder="Enter Domain..."
             name="webURL"
             value={this.state.webURL}
             onChange={e => this.change(e)}
