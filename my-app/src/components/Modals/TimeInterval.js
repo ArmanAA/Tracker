@@ -2,9 +2,10 @@ import React from "react";
 import Modal from "react-responsive-modal";
 import Datetime from "react-datetime";
 import styles from "../../Styles/style.css";
-import ErrorMessage from "./ErrorMessage";
-//import styles from "../../Styles/style.css";
 import moment from "moment";
+import Report from "../Report/Report";
+import { Link } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 const modalStyle = {
   modal: {
     width: "60%"
@@ -28,7 +29,10 @@ class TimeInterval extends React.Component {
       pageViewCount: "",
       show: false,
       showMessage: false,
-      message: ""
+      message: "",
+      data: props.data,
+      newData: [],
+      redirect: false
     };
   }
 
@@ -39,74 +43,41 @@ class TimeInterval extends React.Component {
   onCloseModal = () => {
     this.setState({ open: false });
   };
-  onOpenMessageModal = () => {
-    this.setState({ showMessage: true });
-  };
 
-  onCloseMessageModal = () => {
-    this.setState({ showMessage: false });
-  };
   componentWillUpdate() {}
   handleStartDate = date => {
     if (moment.isMoment(date)) {
       this.setState({ startTime: date.format() });
     }
-
-    //alert(this.state.startDate);
   };
   handleEndDate = date => {
-    // alert("in end date");
     if (moment.isMoment(date)) {
       this.setState({ endTime: date.format() });
     }
+  };
 
-    //alert(this.state.startDate);
-  };
-  renderMessage = () => {
-    if (this.state.showMessage) {
-      return (
-        <ErrorMessage
-          styles={modalStyle}
-          show={this.state.showMessage}
-          onClose={this.onCloseMessageModal}
-          message={this.state.message}
-        />
-      );
-    }
-  };
-  onSubmit = e => {
-    e.preventDefault();
-    console.log(this.state.startTime);
-    console.log(this.state.endTime);
-    fetch("http://localhost:8080/api/dash/tracktimeinterval", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(this.state)
-    })
-      .then(res => {
-        if (!res.ok) {
-          if (res.status === 406) {
-            console.log("Failure: ", JSON.stringify(res.status));
-          }
-          console.log("Failure: ", JSON.stringify(res.status));
-        } else {
-          res.json().then(json => {
-            this.setState({ pageViewCount: json.count });
-            console.log(json);
-            this.setState({
-              message:
-                this.state.pageViewCount +
-                " Pageview for " +
-                this.state.url +
-                " during that time."
-            });
-            this.setState({ showMessage: true });
-          });
-        }
-      })
+  // onSubmit = e => {
+  //   e.preventDefault();
 
-      .catch(error => console.log(error));
-  };
+  //   fetch("http://localhost:8080/api/dash/tracktimeinterval", {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify(this.state)
+  //   })
+  //     .then(results => results.json())
+  //     .then(results => {
+  //       this.setState({ newData: results.message });
+  //       console.log(this.state.newData);
+  //       // this.setState({ redirect: true });
+  //     });
+  // };
+  // renderRedirect = () => {
+  //   if (this.state.redirect) {
+  //     let myurl = "/report/" + this.state.username + "/" + this.state.url;
+
+  //     return <Redirect to={myurl} />;
+  //   }
+  // };
   render() {
     return (
       <div styles={divStyle}>
@@ -118,23 +89,15 @@ class TimeInterval extends React.Component {
           center
         >
           <label>Start Time</label>
-          {/* <input
-            type="date"
-            id="start"
-            name="trip"
-            value="2018-07-22"
-            min="2018-01-01"
-            max="2018-12-31"
-          /> */}
-          <Datetime onChange={this.handleStartDate} />
+
+          <Datetime onChange={this.props.handleStartDate} />
           <br />
           <label>End Time</label>
-          <Datetime onChange={this.handleEndDate} />
+          <Datetime onChange={this.props.handleEndDate} />
           <br />
-          <button className={styles.button} onClick={e => this.onSubmit(e)}>
+          <button className={styles.button} onClick={this.props.onSubmit}>
             Submit
           </button>
-          {this.renderMessage()}
         </Modal>
       </div>
     );

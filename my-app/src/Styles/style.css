@@ -25,7 +25,17 @@ header{
     font-family: 'Monoton', cursive;  
    
   }
-
+  .buttonCenter{
+      text-align: center;
+    width: 250px;
+    padding: 10px;
+    border-radius: 5px;
+    color:white;
+    font-family: 'VT323', monospace;
+    font-size: 28px;
+    background-color:#D2691E;
+    
+} 
  .button{
     width: 250px;
     padding: 10px;

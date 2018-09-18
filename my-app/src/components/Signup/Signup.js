@@ -82,7 +82,6 @@ class Signup extends Component {
   };
   onSubmit = e => {
     e.preventDefault();
-    console.log(this.state);
 
     if (this.checkInputFields()) {
       fetch("http://localhost:8080/api/dash/signup", {

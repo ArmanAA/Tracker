@@ -3,6 +3,7 @@ import { BootstrapTable, TableHeaderColumn } from "react-bootstrap-table";
 import TimeInterval from "../Modals/TimeInterval";
 import moment from "moment";
 import styles from "../../Styles/style.css";
+import { Redirect } from "react-router-dom";
 
 class UserHistory extends Component {
   constructor(props) {
@@ -11,19 +12,12 @@ class UserHistory extends Component {
       username: this.props.match.params.id,
       moment: moment(),
       data: [],
-      date: new Date(),
       url: "",
-      show: false
+      show: false,
+      redirect: false
     };
-    this.handleShow = this.handleShow.bind(this);
-    this.handleClose = this.handleClose.bind(this);
   }
-  handleClose() {
-    this.setState({ show: false });
-  }
-  handleShow() {
-    this.setState({ show: true });
-  }
+
   componentDidMount() {
     var url =
       "http://localhost:8080/api/dash/webtrackhistory/" + this.state.username;
@@ -31,7 +25,6 @@ class UserHistory extends Component {
     fetch(url)
       .then(results => results.json())
       .then(results => {
-        console.log(results);
         this.setState({ data: results.message });
       });
   }
@@ -41,31 +34,38 @@ class UserHistory extends Component {
     });
   };
 
-  showTimeInterval = () => {
-    if (this.state.show) {
-      return (
-        <TimeInterval
-          url={this.state.url}
-          username={this.state.username}
-          show={this.state.show}
-          onClose={this.handleClose}
-        />
-      );
+  // showTimeInterval = () => {
+  //   if (this.state.show) {
+  //     return (
+  //       <TimeInterval
+  //         url={this.state.url}
+  //         username={this.state.username}
+  //         show={this.state.show}
+  //         onClose={this.handleClose}
+  //       />
+  //     );
+  //   }
+  // };
+  renderRedirect = () => {
+    if (this.state.redirect) {
+      let myurl = "/tracks/" + this.state.username + "/" + this.state.url;
+
+      return <Redirect to={myurl} />;
     }
   };
-  onChange = date => this.setState({ date });
+
   render() {
     var options = {
       onRowClick: function(row) {
         this.setState({ url: row.Url });
-        this.setState({ show: true });
+        this.setState({ redirect: true });
       }.bind(this)
     };
     return (
       <div>
-        <h1 className={styles.h1Tag}>Tracked Webs Report</h1>
+        <h1 className={styles.h1Tag}>Tracked Websites</h1>
         <h4 className={styles.h4Tag}>
-          Click the a row to see page views for a specified time frame.
+          Click a row to add paths to your domain or view report.
         </h4>
 
         <BootstrapTable
@@ -74,11 +74,14 @@ class UserHistory extends Component {
           options={options}
         >
           <TableHeaderColumn isKey dataField="Url">
-            URL
+            Website
           </TableHeaderColumn>
-          <TableHeaderColumn dataField="Count">Page Views</TableHeaderColumn>
+          <TableHeaderColumn dataField="Count">
+            Total Page Views
+          </TableHeaderColumn>
         </BootstrapTable>
-        {this.showTimeInterval()}
+        {/* {this.showTimeInterval()} */}
+        {this.renderRedirect()}
         <div />
       </div>
     );
