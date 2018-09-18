@@ -7,10 +7,8 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	_ "github.com/lib/pq"
 	"github.com/rs/xid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -177,9 +175,6 @@ func main() {
 	apiDash.GET("/getPathReport/:username/:url", func(c *gin.Context) {
 		username := c.Param("username")
 		url := c.Param("url")
-		// pathname := c.Query("pathname")
-
-		// fmt.Println("path name is: ", pathname)
 		id := getUserID(username, *db)
 		regWeb := getRegisteredWeb(url, id, *db)
 		outputTracks := getPathTracks(regWeb.UniqueID, *db)
